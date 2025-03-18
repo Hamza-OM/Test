@@ -1,0 +1,1 @@
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="UpdateStock.aspx.cs" Inherits="ProductManagementSystem.UpdateStock" ContentType="application/json" %> 
