@@ -2,40 +2,19 @@ using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Configuration;
-using System.Web;
 
 namespace ProductManagementSystem.Models
 {
-    /// <summary>
-    /// Database helper class for managing SQL Server connections and operations
-    /// </summary>
     public class Database
     {
-        // Connection string - in a real application, this would come from Web.config
-        private static string connectionString = @"Data Source=(local)\SQLEXPRESS;Initial Catalog=ProductManagementDB;Integrated Security=True";
+        private static string connectionString = ConfigurationManager.ConnectionStrings["ProductManagementDB"].ConnectionString;
 
-        /// <summary>
-        /// Creates and returns a new SqlConnection object
-        /// </summary>
-        public static SqlConnection GetConnection()
-        {
-            try
-            {
-                SqlConnection connection = new SqlConnection(connectionString);
-                return connection;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error creating database connection: " + ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// Executes a SQL query and returns a DataTable with the results
-        /// </summary>
+        // Execute a SQL command that returns data (SELECT)
         public static DataTable ExecuteQuery(string query, SqlParameter[] parameters = null)
         {
-            using (SqlConnection connection = GetConnection())
+            DataTable dataTable = new DataTable();
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
@@ -44,37 +23,28 @@ namespace ProductManagementSystem.Models
                         command.Parameters.AddRange(parameters);
                     }
 
-                    DataTable dataTable = new DataTable();
                     try
                     {
                         connection.Open();
-                        using (SqlDataAdapter adapter = new SqlDataAdapter(command))
-                        {
-                            adapter.Fill(dataTable);
-                        }
+                        SqlDataAdapter adapter = new SqlDataAdapter(command);
+                        adapter.Fill(dataTable);
                     }
                     catch (Exception ex)
                     {
-                        throw new Exception("Error executing query: " + ex.Message);
+                        throw new Exception("Database error: " + ex.Message);
                     }
-                    finally
-                    {
-                        if (connection.State == ConnectionState.Open)
-                        {
-                            connection.Close();
-                        }
-                    }
-                    return dataTable;
                 }
             }
+
+            return dataTable;
         }
 
-        /// <summary>
-        /// Executes a non-query SQL command (INSERT, UPDATE, DELETE) and returns the number of rows affected
-        /// </summary>
+        // Execute a SQL command that modifies data (INSERT, UPDATE, DELETE)
         public static int ExecuteNonQuery(string query, SqlParameter[] parameters = null)
         {
-            using (SqlConnection connection = GetConnection())
+            int rowsAffected = 0;
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
@@ -83,7 +53,6 @@ namespace ProductManagementSystem.Models
                         command.Parameters.AddRange(parameters);
                     }
 
-                    int rowsAffected = 0;
                     try
                     {
                         connection.Open();
@@ -91,26 +60,20 @@ namespace ProductManagementSystem.Models
                     }
                     catch (Exception ex)
                     {
-                        throw new Exception("Error executing non-query: " + ex.Message);
+                        throw new Exception("Database error: " + ex.Message);
                     }
-                    finally
-                    {
-                        if (connection.State == ConnectionState.Open)
-                        {
-                            connection.Close();
-                        }
-                    }
-                    return rowsAffected;
                 }
             }
+
+            return rowsAffected;
         }
 
-        /// <summary>
-        /// Executes a SQL command and returns a single scalar value
-        /// </summary>
+        // Execute a SQL command that returns a single value
         public static object ExecuteScalar(string query, SqlParameter[] parameters = null)
         {
-            using (SqlConnection connection = GetConnection())
+            object result = null;
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
@@ -119,7 +82,6 @@ namespace ProductManagementSystem.Models
                         command.Parameters.AddRange(parameters);
                     }
 
-                    object result = null;
                     try
                     {
                         connection.Open();
@@ -127,18 +89,12 @@ namespace ProductManagementSystem.Models
                     }
                     catch (Exception ex)
                     {
-                        throw new Exception("Error executing scalar: " + ex.Message);
+                        throw new Exception("Database error: " + ex.Message);
                     }
-                    finally
-                    {
-                        if (connection.State == ConnectionState.Open)
-                        {
-                            connection.Close();
-                        }
-                    }
-                    return result;
                 }
             }
+
+            return result;
         }
     }
 } 

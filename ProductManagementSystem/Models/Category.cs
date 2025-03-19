@@ -5,188 +5,107 @@ using System.Data.SqlClient;
 
 namespace ProductManagementSystem.Models
 {
-    /// <summary>
-    /// Category model class
-    /// </summary>
     public class Category
     {
         public int CategoryID { get; set; }
         public string CategoryName { get; set; }
         public string Description { get; set; }
-        public DateTime CreatedDate { get; set; }
 
-        /// <summary>
-        /// Default constructor
-        /// </summary>
-        public Category()
-        {
-            CategoryID = 0;
-            CategoryName = string.Empty;
-            Description = string.Empty;
-            CreatedDate = DateTime.Now;
-        }
-
-        /// <summary>
-        /// Parameterized constructor
-        /// </summary>
-        public Category(int categoryID, string categoryName, string description, DateTime createdDate)
-        {
-            CategoryID = categoryID;
-            CategoryName = categoryName;
-            Description = description;
-            CreatedDate = createdDate;
-        }
-
-        #region Database Operations
-
-        /// <summary>
-        /// Gets all categories from the database
-        /// </summary>
+        // Get all categories
         public static List<Category> GetAllCategories()
         {
             List<Category> categories = new List<Category>();
-            string query = "SELECT CategoryID, CategoryName, Description, CreatedDate FROM Categories ORDER BY CategoryName";
+            string query = "SELECT CategoryID, CategoryName, Description FROM Categories";
             
-            try
+            DataTable dataTable = Database.ExecuteQuery(query);
+            
+            foreach (DataRow row in dataTable.Rows)
             {
-                DataTable dataTable = Database.ExecuteQuery(query);
-                
-                foreach (DataRow row in dataTable.Rows)
+                categories.Add(new Category
                 {
-                    Category category = new Category
-                    {
-                        CategoryID = Convert.ToInt32(row["CategoryID"]),
-                        CategoryName = row["CategoryName"].ToString(),
-                        Description = row["Description"].ToString(),
-                        CreatedDate = Convert.ToDateTime(row["CreatedDate"])
-                    };
-                    
-                    categories.Add(category);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error getting categories: " + ex.Message);
+                    CategoryID = Convert.ToInt32(row["CategoryID"]),
+                    CategoryName = row["CategoryName"].ToString(),
+                    Description = row["Description"].ToString()
+                });
             }
             
             return categories;
         }
 
-        /// <summary>
-        /// Gets a category by ID
-        /// </summary>
+        // Get a specific category by ID
         public static Category GetCategoryByID(int categoryID)
         {
-            Category category = null;
-            string query = "SELECT CategoryID, CategoryName, Description, CreatedDate FROM Categories WHERE CategoryID = @CategoryID";
-            
+            string query = "SELECT CategoryID, CategoryName, Description FROM Categories WHERE CategoryID = @CategoryID";
             SqlParameter[] parameters = new SqlParameter[]
             {
                 new SqlParameter("@CategoryID", categoryID)
             };
             
-            try
+            DataTable dataTable = Database.ExecuteQuery(query, parameters);
+            
+            if (dataTable.Rows.Count > 0)
             {
-                DataTable dataTable = Database.ExecuteQuery(query, parameters);
-                
-                if (dataTable.Rows.Count > 0)
+                DataRow row = dataTable.Rows[0];
+                return new Category
                 {
-                    DataRow row = dataTable.Rows[0];
-                    category = new Category
-                    {
-                        CategoryID = Convert.ToInt32(row["CategoryID"]),
-                        CategoryName = row["CategoryName"].ToString(),
-                        Description = row["Description"].ToString(),
-                        CreatedDate = Convert.ToDateTime(row["CreatedDate"])
-                    };
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error getting category: " + ex.Message);
+                    CategoryID = Convert.ToInt32(row["CategoryID"]),
+                    CategoryName = row["CategoryName"].ToString(),
+                    Description = row["Description"].ToString()
+                };
             }
             
-            return category;
+            return null;
         }
 
-        /// <summary>
-        /// Inserts a new category
-        /// </summary>
-        public bool Insert()
+        // Insert a new category
+        public int Insert()
         {
-            string query = "INSERT INTO Categories (CategoryName, Description) VALUES (@CategoryName, @Description); SELECT SCOPE_IDENTITY();";
-            
+            string query = "INSERT INTO Categories (CategoryName, Description) VALUES (@CategoryName, @Description); SELECT SCOPE_IDENTITY()";
             SqlParameter[] parameters = new SqlParameter[]
             {
                 new SqlParameter("@CategoryName", CategoryName),
-                new SqlParameter("@Description", Description)
+                new SqlParameter("@Description", Description ?? (object)DBNull.Value)
             };
             
-            try
+            object result = Database.ExecuteScalar(query, parameters);
+            
+            if (result != null && result != DBNull.Value)
             {
-                object result = Database.ExecuteScalar(query, parameters);
-                if (result != null && result != DBNull.Value)
-                {
-                    CategoryID = Convert.ToInt32(result);
-                    return true;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error inserting category: " + ex.Message);
+                CategoryID = Convert.ToInt32(result);
+                return CategoryID;
             }
             
-            return false;
+            return 0;
         }
 
-        /// <summary>
-        /// Updates an existing category
-        /// </summary>
+        // Update an existing category
         public bool Update()
         {
             string query = "UPDATE Categories SET CategoryName = @CategoryName, Description = @Description WHERE CategoryID = @CategoryID";
-            
             SqlParameter[] parameters = new SqlParameter[]
             {
                 new SqlParameter("@CategoryID", CategoryID),
                 new SqlParameter("@CategoryName", CategoryName),
-                new SqlParameter("@Description", Description)
+                new SqlParameter("@Description", Description ?? (object)DBNull.Value)
             };
             
-            try
-            {
-                int rowsAffected = Database.ExecuteNonQuery(query, parameters);
-                return rowsAffected > 0;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error updating category: " + ex.Message);
-            }
+            int rowsAffected = Database.ExecuteNonQuery(query, parameters);
+            
+            return rowsAffected > 0;
         }
 
-        /// <summary>
-        /// Deletes a category
-        /// </summary>
+        // Delete a category
         public bool Delete()
         {
             string query = "DELETE FROM Categories WHERE CategoryID = @CategoryID";
-            
             SqlParameter[] parameters = new SqlParameter[]
             {
                 new SqlParameter("@CategoryID", CategoryID)
             };
             
-            try
-            {
-                int rowsAffected = Database.ExecuteNonQuery(query, parameters);
-                return rowsAffected > 0;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error deleting category: " + ex.Message);
-            }
+            int rowsAffected = Database.ExecuteNonQuery(query, parameters);
+            
+            return rowsAffected > 0;
         }
-
-        #endregion
     }
 } 

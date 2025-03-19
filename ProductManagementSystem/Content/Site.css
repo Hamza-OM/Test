@@ -1,0 +1,158 @@
+body {
+    padding-top: 10px;
+    padding-bottom: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #f8f8f8;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding: 15px;
+}
+
+/* Set width on the form input elements */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+/* Buttons styling */
+.btn-primary {
+    background-color: #2c3e50;
+    border-color: #2c3e50;
+}
+
+.btn-primary:hover {
+    background-color: #1a242f;
+    border-color: #161f29;
+}
+
+.btn-danger {
+    background-color: #e74c3c;
+    border-color: #e74c3c;
+}
+
+.btn-danger:hover {
+    background-color: #c0392b;
+    border-color: #c0392b;
+}
+
+.btn-info {
+    background-color: #3498db;
+    border-color: #3498db;
+}
+
+.btn-info:hover {
+    background-color: #2980b9;
+    border-color: #2980b9;
+}
+
+/* Basic table styling */
+.table {
+    border: 1px solid #ddd;
+}
+
+.table th {
+    background-color: #f5f5f5;
+}
+
+/* Jumbotron styling */
+.jumbotron {
+    background-color: #2c3e50;
+    color: white;
+    padding: 30px;
+    margin-bottom: 30px;
+    border-radius: 4px;
+}
+
+/* Panel styling */
+.panel {
+    margin-top: 20px;
+}
+
+.panel-heading {
+    font-weight: bold;
+    background-color: #f5f5f5;
+}
+
+.panel-primary > .panel-heading {
+    background-color: #2c3e50;
+    border-color: #2c3e50;
+}
+
+/* Form styling */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-control:focus {
+    border-color: #2c3e50;
+    box-shadow: 0 0 8px rgba(44, 62, 80, 0.25);
+}
+
+/* Required field indicator */
+.required-field::after {
+    content: " *";
+    color: red;
+}
+
+/* Custom styles for icons on dashboard */
+.dashboard-icon {
+    font-size: 48px;
+    color: #777;
+    opacity: 0.7;
+}
+
+/* Custom styles */
+.dashboard-card {
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    color: white;
+    text-align: center;
+}
+
+.dashboard-card h2 {
+    font-size: 48px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.dashboard-card-blue {
+    background-color: #3498db;
+}
+
+.dashboard-card-green {
+    background-color: #2ecc71;
+}
+
+.dashboard-card-orange {
+    background-color: #e67e22;
+}
+
+.table-responsive {
+    margin-top: 20px;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+.action-buttons {
+    white-space: nowrap;
+}
+
+.panel-title {
+    font-size: 24px;
+}
+
+.search-box {
+    margin-bottom: 20px;
+}
+
+/* Simple well style */
+.well {
+    border: 1px solid #e3e3e3;
+    padding: 19px;
+} 

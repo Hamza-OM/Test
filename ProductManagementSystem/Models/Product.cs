@@ -5,391 +5,245 @@ using System.Data.SqlClient;
 
 namespace ProductManagementSystem.Models
 {
-    /// <summary>
-    /// Product model class
-    /// </summary>
     public class Product
     {
         public int ProductID { get; set; }
         public string ProductName { get; set; }
         public int CategoryID { get; set; }
-        public decimal UnitPrice { get; set; }
-        public int UnitsInStock { get; set; }
-        public string Description { get; set; }
-        public string ImagePath { get; set; }
-        public DateTime CreatedDate { get; set; }
-        
-        // Navigation property
         public string CategoryName { get; set; }
+        public decimal Price { get; set; }
+        public int StockQuantity { get; set; }
+        public string Description { get; set; }
 
-        /// <summary>
-        /// Default constructor
-        /// </summary>
-        public Product()
-        {
-            ProductID = 0;
-            ProductName = string.Empty;
-            CategoryID = 0;
-            UnitPrice = 0;
-            UnitsInStock = 0;
-            Description = string.Empty;
-            ImagePath = string.Empty;
-            CreatedDate = DateTime.Now;
-            CategoryName = string.Empty;
-        }
-
-        /// <summary>
-        /// Parameterized constructor
-        /// </summary>
-        public Product(int productID, string productName, int categoryID, decimal unitPrice, 
-                      int unitsInStock, string description, string imagePath, DateTime createdDate)
-        {
-            ProductID = productID;
-            ProductName = productName;
-            CategoryID = categoryID;
-            UnitPrice = unitPrice;
-            UnitsInStock = unitsInStock;
-            Description = description;
-            ImagePath = imagePath;
-            CreatedDate = createdDate;
-        }
-
-        #region Database Operations
-
-        /// <summary>
-        /// Gets all products from the database with category information
-        /// </summary>
+        // Get all products with category names
         public static List<Product> GetAllProducts()
         {
             List<Product> products = new List<Product>();
-            string query = @"
-                SELECT p.ProductID, p.ProductName, p.CategoryID, p.UnitPrice, p.UnitsInStock,
-                       p.Description, p.ImagePath, p.CreatedDate, c.CategoryName
-                FROM Products p
-                INNER JOIN Categories c ON p.CategoryID = c.CategoryID
-                ORDER BY p.ProductName";
+            string query = @"SELECT p.ProductID, p.ProductName, p.CategoryID, c.CategoryName, 
+                           p.Price, p.StockQuantity, p.Description 
+                           FROM Products p 
+                           LEFT JOIN Categories c ON p.CategoryID = c.CategoryID";
             
-            try
+            DataTable dataTable = Database.ExecuteQuery(query);
+            
+            foreach (DataRow row in dataTable.Rows)
             {
-                DataTable dataTable = Database.ExecuteQuery(query);
-                
-                foreach (DataRow row in dataTable.Rows)
+                products.Add(new Product
                 {
-                    Product product = new Product
-                    {
-                        ProductID = Convert.ToInt32(row["ProductID"]),
-                        ProductName = row["ProductName"].ToString(),
-                        CategoryID = Convert.ToInt32(row["CategoryID"]),
-                        UnitPrice = Convert.ToDecimal(row["UnitPrice"]),
-                        UnitsInStock = Convert.ToInt32(row["UnitsInStock"]),
-                        Description = row["Description"].ToString(),
-                        ImagePath = row["ImagePath"] == DBNull.Value ? string.Empty : row["ImagePath"].ToString(),
-                        CreatedDate = Convert.ToDateTime(row["CreatedDate"]),
-                        CategoryName = row["CategoryName"].ToString()
-                    };
-                    
-                    products.Add(product);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error getting products: " + ex.Message);
+                    ProductID = Convert.ToInt32(row["ProductID"]),
+                    ProductName = row["ProductName"].ToString(),
+                    CategoryID = Convert.ToInt32(row["CategoryID"]),
+                    CategoryName = row["CategoryName"].ToString(),
+                    Price = Convert.ToDecimal(row["Price"]),
+                    StockQuantity = Convert.ToInt32(row["StockQuantity"]),
+                    Description = row["Description"].ToString()
+                });
             }
             
             return products;
         }
 
-        /// <summary>
-        /// Gets products by category ID
-        /// </summary>
-        public static List<Product> GetProductsByCategoryID(int categoryID)
-        {
-            List<Product> products = new List<Product>();
-            string query = @"
-                SELECT p.ProductID, p.ProductName, p.CategoryID, p.UnitPrice, p.UnitsInStock,
-                       p.Description, p.ImagePath, p.CreatedDate, c.CategoryName
-                FROM Products p
-                INNER JOIN Categories c ON p.CategoryID = c.CategoryID
-                WHERE p.CategoryID = @CategoryID
-                ORDER BY p.ProductName";
-            
-            SqlParameter[] parameters = new SqlParameter[]
-            {
-                new SqlParameter("@CategoryID", categoryID)
-            };
-            
-            try
-            {
-                DataTable dataTable = Database.ExecuteQuery(query, parameters);
-                
-                foreach (DataRow row in dataTable.Rows)
-                {
-                    Product product = new Product
-                    {
-                        ProductID = Convert.ToInt32(row["ProductID"]),
-                        ProductName = row["ProductName"].ToString(),
-                        CategoryID = Convert.ToInt32(row["CategoryID"]),
-                        UnitPrice = Convert.ToDecimal(row["UnitPrice"]),
-                        UnitsInStock = Convert.ToInt32(row["UnitsInStock"]),
-                        Description = row["Description"].ToString(),
-                        ImagePath = row["ImagePath"] == DBNull.Value ? string.Empty : row["ImagePath"].ToString(),
-                        CreatedDate = Convert.ToDateTime(row["CreatedDate"]),
-                        CategoryName = row["CategoryName"].ToString()
-                    };
-                    
-                    products.Add(product);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error getting products by category: " + ex.Message);
-            }
-            
-            return products;
-        }
-
-        /// <summary>
-        /// Gets a product by ID
-        /// </summary>
+        // Get a specific product by ID
         public static Product GetProductByID(int productID)
         {
-            Product product = null;
-            string query = @"
-                SELECT p.ProductID, p.ProductName, p.CategoryID, p.UnitPrice, p.UnitsInStock,
-                       p.Description, p.ImagePath, p.CreatedDate, c.CategoryName
-                FROM Products p
-                INNER JOIN Categories c ON p.CategoryID = c.CategoryID
-                WHERE p.ProductID = @ProductID";
-            
+            string query = @"SELECT p.ProductID, p.ProductName, p.CategoryID, c.CategoryName, 
+                           p.Price, p.StockQuantity, p.Description 
+                           FROM Products p 
+                           LEFT JOIN Categories c ON p.CategoryID = c.CategoryID 
+                           WHERE p.ProductID = @ProductID";
+                           
             SqlParameter[] parameters = new SqlParameter[]
             {
                 new SqlParameter("@ProductID", productID)
             };
             
-            try
+            DataTable dataTable = Database.ExecuteQuery(query, parameters);
+            
+            if (dataTable.Rows.Count > 0)
             {
-                DataTable dataTable = Database.ExecuteQuery(query, parameters);
-                
-                if (dataTable.Rows.Count > 0)
+                DataRow row = dataTable.Rows[0];
+                return new Product
                 {
-                    DataRow row = dataTable.Rows[0];
-                    product = new Product
-                    {
-                        ProductID = Convert.ToInt32(row["ProductID"]),
-                        ProductName = row["ProductName"].ToString(),
-                        CategoryID = Convert.ToInt32(row["CategoryID"]),
-                        UnitPrice = Convert.ToDecimal(row["UnitPrice"]),
-                        UnitsInStock = Convert.ToInt32(row["UnitsInStock"]),
-                        Description = row["Description"].ToString(),
-                        ImagePath = row["ImagePath"] == DBNull.Value ? string.Empty : row["ImagePath"].ToString(),
-                        CreatedDate = Convert.ToDateTime(row["CreatedDate"]),
-                        CategoryName = row["CategoryName"].ToString()
-                    };
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error getting product: " + ex.Message);
+                    ProductID = Convert.ToInt32(row["ProductID"]),
+                    ProductName = row["ProductName"].ToString(),
+                    CategoryID = Convert.ToInt32(row["CategoryID"]),
+                    CategoryName = row["CategoryName"].ToString(),
+                    Price = Convert.ToDecimal(row["Price"]),
+                    StockQuantity = Convert.ToInt32(row["StockQuantity"]),
+                    Description = row["Description"].ToString()
+                };
             }
             
-            return product;
+            return null;
         }
 
-        /// <summary>
-        /// Inserts a new product
-        /// </summary>
-        public bool Insert()
+        // Get products by category ID
+        public static List<Product> GetProductsByCategoryID(int categoryID)
         {
-            string query = @"
-                INSERT INTO Products (ProductName, CategoryID, UnitPrice, UnitsInStock, Description, ImagePath)
-                VALUES (@ProductName, @CategoryID, @UnitPrice, @UnitsInStock, @Description, @ImagePath);
-                SELECT SCOPE_IDENTITY();";
+            List<Product> products = new List<Product>();
+            string query = @"SELECT p.ProductID, p.ProductName, p.CategoryID, c.CategoryName, 
+                           p.Price, p.StockQuantity, p.Description 
+                           FROM Products p 
+                           LEFT JOIN Categories c ON p.CategoryID = c.CategoryID 
+                           WHERE p.CategoryID = @CategoryID";
+                           
+            SqlParameter[] parameters = new SqlParameter[]
+            {
+                new SqlParameter("@CategoryID", categoryID)
+            };
             
+            DataTable dataTable = Database.ExecuteQuery(query, parameters);
+            
+            foreach (DataRow row in dataTable.Rows)
+            {
+                products.Add(new Product
+                {
+                    ProductID = Convert.ToInt32(row["ProductID"]),
+                    ProductName = row["ProductName"].ToString(),
+                    CategoryID = Convert.ToInt32(row["CategoryID"]),
+                    CategoryName = row["CategoryName"].ToString(),
+                    Price = Convert.ToDecimal(row["Price"]),
+                    StockQuantity = Convert.ToInt32(row["StockQuantity"]),
+                    Description = row["Description"].ToString()
+                });
+            }
+            
+            return products;
+        }
+
+        // Insert a new product
+        public int Insert()
+        {
+            string query = @"INSERT INTO Products (ProductName, CategoryID, Price, StockQuantity, Description) 
+                           VALUES (@ProductName, @CategoryID, @Price, @StockQuantity, @Description); 
+                           SELECT SCOPE_IDENTITY()";
+                           
             SqlParameter[] parameters = new SqlParameter[]
             {
                 new SqlParameter("@ProductName", ProductName),
                 new SqlParameter("@CategoryID", CategoryID),
-                new SqlParameter("@UnitPrice", UnitPrice),
-                new SqlParameter("@UnitsInStock", UnitsInStock),
-                new SqlParameter("@Description", Description),
-                new SqlParameter("@ImagePath", string.IsNullOrEmpty(ImagePath) ? DBNull.Value : (object)ImagePath)
+                new SqlParameter("@Price", Price),
+                new SqlParameter("@StockQuantity", StockQuantity),
+                new SqlParameter("@Description", Description ?? (object)DBNull.Value)
             };
             
-            try
+            object result = Database.ExecuteScalar(query, parameters);
+            
+            if (result != null && result != DBNull.Value)
             {
-                object result = Database.ExecuteScalar(query, parameters);
-                if (result != null && result != DBNull.Value)
-                {
-                    ProductID = Convert.ToInt32(result);
-                    return true;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error inserting product: " + ex.Message);
+                ProductID = Convert.ToInt32(result);
+                return ProductID;
             }
             
-            return false;
+            return 0;
         }
 
-        /// <summary>
-        /// Updates an existing product
-        /// </summary>
+        // Update an existing product
         public bool Update()
         {
-            string query = @"
-                UPDATE Products
-                SET ProductName = @ProductName,
-                    CategoryID = @CategoryID,
-                    UnitPrice = @UnitPrice,
-                    UnitsInStock = @UnitsInStock,
-                    Description = @Description,
-                    ImagePath = @ImagePath
-                WHERE ProductID = @ProductID";
-            
+            string query = @"UPDATE Products 
+                           SET ProductName = @ProductName, 
+                               CategoryID = @CategoryID, 
+                               Price = @Price, 
+                               StockQuantity = @StockQuantity, 
+                               Description = @Description 
+                           WHERE ProductID = @ProductID";
+                           
             SqlParameter[] parameters = new SqlParameter[]
             {
                 new SqlParameter("@ProductID", ProductID),
                 new SqlParameter("@ProductName", ProductName),
                 new SqlParameter("@CategoryID", CategoryID),
-                new SqlParameter("@UnitPrice", UnitPrice),
-                new SqlParameter("@UnitsInStock", UnitsInStock),
-                new SqlParameter("@Description", Description),
-                new SqlParameter("@ImagePath", string.IsNullOrEmpty(ImagePath) ? DBNull.Value : (object)ImagePath)
+                new SqlParameter("@Price", Price),
+                new SqlParameter("@StockQuantity", StockQuantity),
+                new SqlParameter("@Description", Description ?? (object)DBNull.Value)
             };
             
-            try
-            {
-                int rowsAffected = Database.ExecuteNonQuery(query, parameters);
-                return rowsAffected > 0;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error updating product: " + ex.Message);
-            }
+            int rowsAffected = Database.ExecuteNonQuery(query, parameters);
+            
+            return rowsAffected > 0;
         }
 
-        /// <summary>
-        /// Deletes a product
-        /// </summary>
+        // Delete a product
         public bool Delete()
         {
             string query = "DELETE FROM Products WHERE ProductID = @ProductID";
-            
             SqlParameter[] parameters = new SqlParameter[]
             {
                 new SqlParameter("@ProductID", ProductID)
             };
             
-            try
-            {
-                int rowsAffected = Database.ExecuteNonQuery(query, parameters);
-                return rowsAffected > 0;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error deleting product: " + ex.Message);
-            }
+            int rowsAffected = Database.ExecuteNonQuery(query, parameters);
+            
+            return rowsAffected > 0;
         }
-
-        /// <summary>
-        /// Searches products by name or description (additional operation 1)
-        /// </summary>
+        
+        // Search products by name
         public static List<Product> SearchProducts(string searchTerm)
         {
             List<Product> products = new List<Product>();
-            string query = @"
-                SELECT p.ProductID, p.ProductName, p.CategoryID, p.UnitPrice, p.UnitsInStock,
-                       p.Description, p.ImagePath, p.CreatedDate, c.CategoryName
-                FROM Products p
-                INNER JOIN Categories c ON p.CategoryID = c.CategoryID
-                WHERE p.ProductName LIKE @SearchTerm OR p.Description LIKE @SearchTerm
-                ORDER BY p.ProductName";
-            
+            string query = @"SELECT p.ProductID, p.ProductName, p.CategoryID, c.CategoryName, 
+                           p.Price, p.StockQuantity, p.Description 
+                           FROM Products p 
+                           LEFT JOIN Categories c ON p.CategoryID = c.CategoryID 
+                           WHERE p.ProductName LIKE @SearchTerm OR p.Description LIKE @SearchTerm";
+                           
             SqlParameter[] parameters = new SqlParameter[]
             {
                 new SqlParameter("@SearchTerm", "%" + searchTerm + "%")
             };
             
-            try
+            DataTable dataTable = Database.ExecuteQuery(query, parameters);
+            
+            foreach (DataRow row in dataTable.Rows)
             {
-                DataTable dataTable = Database.ExecuteQuery(query, parameters);
-                
-                foreach (DataRow row in dataTable.Rows)
+                products.Add(new Product
                 {
-                    Product product = new Product
-                    {
-                        ProductID = Convert.ToInt32(row["ProductID"]),
-                        ProductName = row["ProductName"].ToString(),
-                        CategoryID = Convert.ToInt32(row["CategoryID"]),
-                        UnitPrice = Convert.ToDecimal(row["UnitPrice"]),
-                        UnitsInStock = Convert.ToInt32(row["UnitsInStock"]),
-                        Description = row["Description"].ToString(),
-                        ImagePath = row["ImagePath"] == DBNull.Value ? string.Empty : row["ImagePath"].ToString(),
-                        CreatedDate = Convert.ToDateTime(row["CreatedDate"]),
-                        CategoryName = row["CategoryName"].ToString()
-                    };
-                    
-                    products.Add(product);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error searching products: " + ex.Message);
+                    ProductID = Convert.ToInt32(row["ProductID"]),
+                    ProductName = row["ProductName"].ToString(),
+                    CategoryID = Convert.ToInt32(row["CategoryID"]),
+                    CategoryName = row["CategoryName"].ToString(),
+                    Price = Convert.ToDecimal(row["Price"]),
+                    StockQuantity = Convert.ToInt32(row["StockQuantity"]),
+                    Description = row["Description"].ToString()
+                });
             }
             
             return products;
         }
-
-        /// <summary>
-        /// Gets products that are low in stock (additional operation 2)
-        /// </summary>
+        
+        // Get low stock products (less than specified quantity)
         public static List<Product> GetLowStockProducts(int threshold = 10)
         {
             List<Product> products = new List<Product>();
-            string query = @"
-                SELECT p.ProductID, p.ProductName, p.CategoryID, p.UnitPrice, p.UnitsInStock,
-                       p.Description, p.ImagePath, p.CreatedDate, c.CategoryName
-                FROM Products p
-                INNER JOIN Categories c ON p.CategoryID = c.CategoryID
-                WHERE p.UnitsInStock <= @Threshold
-                ORDER BY p.UnitsInStock, p.ProductName";
-            
+            string query = @"SELECT p.ProductID, p.ProductName, p.CategoryID, c.CategoryName, 
+                           p.Price, p.StockQuantity, p.Description 
+                           FROM Products p 
+                           LEFT JOIN Categories c ON p.CategoryID = c.CategoryID 
+                           WHERE p.StockQuantity < @Threshold";
+                           
             SqlParameter[] parameters = new SqlParameter[]
             {
                 new SqlParameter("@Threshold", threshold)
             };
             
-            try
+            DataTable dataTable = Database.ExecuteQuery(query, parameters);
+            
+            foreach (DataRow row in dataTable.Rows)
             {
-                DataTable dataTable = Database.ExecuteQuery(query, parameters);
-                
-                foreach (DataRow row in dataTable.Rows)
+                products.Add(new Product
                 {
-                    Product product = new Product
-                    {
-                        ProductID = Convert.ToInt32(row["ProductID"]),
-                        ProductName = row["ProductName"].ToString(),
-                        CategoryID = Convert.ToInt32(row["CategoryID"]),
-                        UnitPrice = Convert.ToDecimal(row["UnitPrice"]),
-                        UnitsInStock = Convert.ToInt32(row["UnitsInStock"]),
-                        Description = row["Description"].ToString(),
-                        ImagePath = row["ImagePath"] == DBNull.Value ? string.Empty : row["ImagePath"].ToString(),
-                        CreatedDate = Convert.ToDateTime(row["CreatedDate"]),
-                        CategoryName = row["CategoryName"].ToString()
-                    };
-                    
-                    products.Add(product);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error getting low stock products: " + ex.Message);
+                    ProductID = Convert.ToInt32(row["ProductID"]),
+                    ProductName = row["ProductName"].ToString(),
+                    CategoryID = Convert.ToInt32(row["CategoryID"]),
+                    CategoryName = row["CategoryName"].ToString(),
+                    Price = Convert.ToDecimal(row["Price"]),
+                    StockQuantity = Convert.ToInt32(row["StockQuantity"]),
+                    Description = row["Description"].ToString()
+                });
             }
             
             return products;
         }
-
-        #endregion
     }
 } 

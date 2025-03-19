@@ -1,0 +1,102 @@
+@model ProductManagementSystem.Models.Product
+
+@{
+    ViewBag.Title = "Create Product";
+}
+
+<h2>Create Product</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+        <div class="form-group">
+            <label for="ProductName" class="control-label col-md-2 required-field">Product Name</label>
+            <div class="col-md-10">
+                <input type="text" name="ProductName" id="ProductName" class="form-control" required />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="CategoryID" class="control-label col-md-2 required-field">Category</label>
+            <div class="col-md-10">
+                <select name="CategoryID" id="CategoryID" class="form-control" required>
+                    <option value="">-- Select Category --</option>
+                    @foreach (var category in ViewBag.Categories)
+                    {
+                        <option value="@category.CategoryID">@category.CategoryName</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="Price" class="control-label col-md-2 required-field">Price</label>
+            <div class="col-md-10">
+                <input type="number" name="Price" id="Price" class="form-control" step="0.01" min="0" required />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="StockQuantity" class="control-label col-md-2 required-field">Stock Quantity</label>
+            <div class="col-md-10">
+                <input type="number" name="StockQuantity" id="StockQuantity" class="form-control" min="0" required />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="Description" class="control-label col-md-2">Description</label>
+            <div class="col-md-10">
+                <textarea name="Description" id="Description" class="form-control" rows="4"></textarea>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-primary" />
+                @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-default" })
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Form validation
+            $('form').submit(function (e) {
+                var isValid = true;
+                
+                // Validate product name
+                if ($('#ProductName').val() === '') {
+                    alert('Please enter a product name.');
+                    isValid = false;
+                }
+                
+                // Validate category
+                if ($('#CategoryID').val() === '') {
+                    alert('Please select a category.');
+                    isValid = false;
+                }
+                
+                // Validate price
+                var price = $('#Price').val();
+                if (price === '' || isNaN(price) || parseFloat(price) < 0) {
+                    alert('Please enter a valid price.');
+                    isValid = false;
+                }
+                
+                // Validate stock quantity
+                var stock = $('#StockQuantity').val();
+                if (stock === '' || isNaN(stock) || parseInt(stock) < 0) {
+                    alert('Please enter a valid stock quantity.');
+                    isValid = false;
+                }
+                
+                return isValid;
+            });
+        });
+    </script>
+} 
