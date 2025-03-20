@@ -45,10 +45,21 @@ namespace PersonalInfoManagement.Controllers
         {
             if (ModelState.IsValid)
             {
-                person.CreatedDate = DateTime.Now;
-                db.Persons.Add(person);
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                try
+                {
+                    person.CreatedDate = DateTime.Now;
+                    db.Persons.Add(person);
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Error saving to database: " + ex.Message);
+                    if (ex.InnerException != null)
+                    {
+                        ModelState.AddModelError("", "Inner exception: " + ex.InnerException.Message);
+                    }
+                }
             }
 
             return View(person);
@@ -76,9 +87,20 @@ namespace PersonalInfoManagement.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(person).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                try
+                {
+                    db.Entry(person).State = EntityState.Modified;
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Error updating database: " + ex.Message);
+                    if (ex.InnerException != null)
+                    {
+                        ModelState.AddModelError("", "Inner exception: " + ex.InnerException.Message);
+                    }
+                }
             }
             return View(person);
         }
@@ -103,10 +125,18 @@ namespace PersonalInfoManagement.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Person person = db.Persons.Find(id);
-            db.Persons.Remove(person);
-            db.SaveChanges();
-            return RedirectToAction("Index");
+            try
+            {
+                Person person = db.Persons.Find(id);
+                db.Persons.Remove(person);
+                db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = "Error deleting record: " + ex.Message;
+                return View("Error");
+            }
         }
 
         protected override void Dispose(bool disposing)
