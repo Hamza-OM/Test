@@ -1,33 +1,30 @@
 @{
-    ViewBag.Title = "Home";
+    ViewBag.Title = "Personal Records";
 }
 
-<h2>Personal Information Management System</h2>
-<p>Welcome to the simple personal information management system.</p>
+<div class="jumbotron" style="background-color: #e3f2fd; border-radius: 10px;">
+    <h1>Personal Records Manager</h1>
+    <p class="lead">A simple solution for managing personal information records.</p>
+</div>
 
-<div style="margin-top: 20px; margin-bottom: 30px;">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="well">
-                <h3>People (@ViewBag.PersonCount)</h3>
-                <p>Manage personal information records</p>
-                <p>@Html.ActionLink("View All People", "Index", "Person", null, new { @class = "btn btn-primary" })</p>
-                <p>@Html.ActionLink("Add New Person", "Create", "Person", null, new { @class = "btn btn-default" })</p>
+<div class="row" style="margin-top: 30px;">
+    <div class="col-md-8 col-md-offset-2">
+        <div class="card" style="border: 1px solid #ddd; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); padding: 20px; margin-bottom: 20px; background-color: #fff;">
+            <h3><i class="glyphicon glyphicon-user" style="margin-right: 10px; color: #337ab7;"></i> People Records (@ViewBag.PersonCount)</h3>
+            <hr style="border-top: 1px solid #eee;">
+            <p>Access and manage all your personal records in one place.</p>
+            <div class="actions" style="margin-top: 20px;">
+                @Html.ActionLink("View All Records", "Index", "Person", null, new { @class = "btn btn-info", style = "margin-right: 10px;" })
+                @Html.ActionLink("Add New Record", "Create", "Person", null, new { @class = "btn btn-success" })
             </div>
         </div>
     </div>
 </div>
 
 <div class="row">
-    <div class="col-md-12">
-        <div class="panel panel-default">
-            <div class="panel-heading">System Information</div>
-            <div class="panel-body">
-                <ul>
-                    <li>Total People: <strong>@ViewBag.PersonCount</strong></li>
-                    <li>Last Updated: @DateTime.Now.ToString("yyyy-MM-dd")</li>
-                </ul>
-            </div>
+    <div class="col-md-8 col-md-offset-2">
+        <div style="text-align: center; margin-top: 20px; padding: 15px; background-color: #f9f9f9; border-radius: 5px;">
+            <p><em>Easily track and manage personal information with our intuitive interface.</em></p>
         </div>
     </div>
 </div> 
