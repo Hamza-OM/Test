@@ -24,7 +24,6 @@ namespace PersonalInfoManagement.Models
         public string Email { get; set; }
         
         [Display(Name = "Phone Number")]
-        [RegularExpression(@"^\d{3}-\d{3}-\d{4}$", ErrorMessage = "Phone number should be in format: 555-123-4567")]
         public string Phone { get; set; }
         
         public string Address { get; set; }

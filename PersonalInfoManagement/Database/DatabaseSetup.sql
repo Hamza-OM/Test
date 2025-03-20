@@ -30,8 +30,8 @@ IF (SELECT COUNT(*) FROM Person) = 0
 BEGIN
     INSERT INTO Person (FirstName, LastName, Age, Gender, Email, Phone, Address)
     VALUES 
-    ('John', 'Doe', 28, 'Male', 'john.doe@example.com', '555-123-4567', '123 Main St, Anytown'),
-    ('Jane', 'Smith', 32, 'Female', 'jane.smith@example.com', '555-987-6543', '456 Oak Ave, Somecity'),
-    ('Michael', 'Johnson', 45, 'Male', 'michael.j@example.com', '555-456-7890', '789 Pine Rd, Anothercity');
+    ('John', 'Doe', 28, 'Male', 'john.doe@example.com', '5551234567', '123 Main St, Anytown'),
+    ('Jane', 'Smith', 32, 'Female', 'jane.smith@example.com', '5559876543', '456 Oak Ave, Somecity'),
+    ('Michael', 'Johnson', 45, 'Male', 'michael.j@example.com', '5554567890', '789 Pine Rd, Anothercity');
 END
 GO 
