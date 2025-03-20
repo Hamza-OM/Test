@@ -3,6 +3,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PersonalInfoManagement.Models
 {
+    public enum GenderType
+    {
+        Male,
+        Female
+    }
+
     public class Person
     {
         public int PersonID { get; set; }
@@ -18,6 +24,7 @@ namespace PersonalInfoManagement.Models
         [Range(1, 120, ErrorMessage = "Age must be between 1 and 120")]
         public int? Age { get; set; }
         
+        [Display(Name = "Gender")]
         public string Gender { get; set; }
         
         [EmailAddress(ErrorMessage = "Invalid Email Address")]

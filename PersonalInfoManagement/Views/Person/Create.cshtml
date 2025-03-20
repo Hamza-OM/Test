@@ -45,8 +45,7 @@
                 {
                     new SelectListItem { Text = "Select Gender", Value = "" },
                     new SelectListItem { Text = "Male", Value = "Male" },
-                    new SelectListItem { Text = "Female", Value = "Female" },
-                    new SelectListItem { Text = "Other", Value = "Other" }
+                    new SelectListItem { Text = "Female", Value = "Female" }
                 }, new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.Gender, "", new { @class = "text-danger" })
             </div>
