@@ -14,7 +14,13 @@ namespace PersonalInfoManagement.Models
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
+            // Map to the "Person" table explicitly
             modelBuilder.Entity<Person>().ToTable("Person");
+            
+            // Configure PersonID property to not be database generated
+            modelBuilder.Entity<Person>()
+                .Property(p => p.PersonID)
+                .HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.None);
         }
     }
 } 

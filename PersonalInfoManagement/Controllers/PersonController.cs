@@ -47,6 +47,14 @@ namespace PersonalInfoManagement.Controllers
             {
                 try
                 {
+                    // Manually assign PersonID - find the max ID and add 1
+                    int newId = 1; // Default if no records exist
+                    if (db.Persons.Any())
+                    {
+                        newId = db.Persons.Max(p => p.PersonID) + 1;
+                    }
+                    person.PersonID = newId;
+                    
                     person.CreatedDate = DateTime.Now;
                     db.Persons.Add(person);
                     db.SaveChanges();
